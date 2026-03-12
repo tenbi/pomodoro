@@ -6,14 +6,26 @@
     <title>Pomodoro Flow</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body>
+  <body data-phase="work">
+    <div class="ambient-backdrop" aria-hidden="true">
+      <div class="ambient-orb ambient-orb-left"></div>
+      <div class="ambient-orb ambient-orb-right"></div>
+      <div class="ambient-orb ambient-orb-bottom"></div>
+      <div class="ambient-grid"></div>
+    </div>
+
     <main class="app-shell">
       <section class="timer-card">
-        <p class="eyebrow">Pomodoro Timer</p>
-        <h1>Pomodoro Flow</h1>
-        <p class="lead">
-          作業と休憩を、止めるまで静かに繰り返すタイマーです。
-        </p>
+        <div class="hero-row">
+          <div>
+            <p class="eyebrow">Pomodoro Timer</p>
+            <h1>Pomodoro Flow</h1>
+            <p class="lead">
+              作業と休憩を、止めるまで静かに繰り返すタイマーです。
+            </p>
+          </div>
+          <div class="glass-pill">Liquid Glass UI</div>
+        </div>
 
         <div class="phase-panel" data-phase="work">
           <p class="phase-label">現在のフェーズ</p>
@@ -21,7 +33,10 @@
           <p id="phaseHint">次は休憩に切り替わります</p>
         </div>
 
-        <div class="time-display" id="timeDisplay" aria-live="polite">25:00</div>
+        <div class="timer-stage">
+          <div class="time-display" id="timeDisplay" aria-live="polite">25:00</div>
+          <div class="timer-caption">Focus on one thing at a time.</div>
+        </div>
 
         <div class="progress-track" aria-hidden="true">
           <div class="progress-bar" id="progressBar"></div>
@@ -74,9 +89,11 @@
           <button id="stopButton">終了</button>
         </div>
 
-        <p class="status-text" id="statusText">
-          開始すると、終了するまで作業と休憩を交互に続けます。
-        </p>
+        <div class="status-panel">
+          <p class="status-text" id="statusText">
+            開始すると、終了するまで作業と休憩を交互に続けます。
+          </p>
+        </div>
       </section>
     </main>
 

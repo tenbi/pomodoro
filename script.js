@@ -60,6 +60,7 @@ function render() {
       : ((state.totalSeconds - state.remainingSeconds) / state.totalSeconds) * 100;
 
   elements.phasePanel.dataset.phase = state.currentPhase;
+  document.body.dataset.phase = state.currentPhase;
   elements.phaseName.textContent = isWork ? "作業時間" : "休憩時間";
   elements.phaseHint.textContent = `次は${nextPhase}に切り替わります`;
   elements.timeDisplay.textContent = formatTime(state.remainingSeconds);
