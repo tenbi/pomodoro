@@ -12,6 +12,8 @@ const elements = {
   workMinutes: document.querySelector("#workMinutes"),
   breakPreset: document.querySelector("#breakPreset"),
   breakMinutes: document.querySelector("#breakMinutes"),
+  notificationStatus: document.querySelector("#notificationStatus"),
+  notificationButton: document.querySelector("#notificationButton"),
 };
 
 const state = {
@@ -23,9 +25,140 @@ const state = {
     work: 25 * 60,
     break: 5 * 60,
   },
+  notificationsEnabled: false,
 };
 
 let timerId = null;
+let audioContext = null;
+
+function getNotificationPermission() {
+  if (!("Notification" in window)) {
+    return "unsupported";
+  }
+
+  return Notification.permission;
+}
+
+function updateNotificationUI() {
+  const permission = getNotificationPermission();
+
+  if (permission === "unsupported") {
+    elements.notificationStatus.textContent = "このブラウザではOS通知を利用できません";
+    elements.notificationButton.textContent = "通知非対応";
+    elements.notificationButton.disabled = true;
+    return;
+  }
+
+  if (permission === "granted") {
+    state.notificationsEnabled = true;
+    elements.notificationStatus.textContent = "フェーズ切替時にOS通知と通知音を送ります";
+    elements.notificationButton.textContent = "通知は有効です";
+    elements.notificationButton.disabled = true;
+    return;
+  }
+
+  if (permission === "denied") {
+    state.notificationsEnabled = false;
+    elements.notificationStatus.textContent =
+      "OS通知は拒否されています。通知音のみ再生されます";
+    elements.notificationButton.textContent = "通知は拒否中";
+    elements.notificationButton.disabled = true;
+    return;
+  }
+
+  state.notificationsEnabled = false;
+  elements.notificationStatus.textContent =
+    "フェーズ切替時に通知音を鳴らします。OS通知も有効化できます";
+  elements.notificationButton.textContent = "通知を有効化";
+  elements.notificationButton.disabled = false;
+}
+
+async function ensureAudioReady() {
+  if (!window.AudioContext && !window.webkitAudioContext) {
+    return null;
+  }
+
+  if (!audioContext) {
+    const AudioCtor = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AudioCtor();
+  }
+
+  if (audioContext.state === "suspended") {
+    await audioContext.resume();
+  }
+
+  return audioContext;
+}
+
+async function playNotificationSound() {
+  const context = await ensureAudioReady();
+  if (!context) {
+    return;
+  }
+
+  const now = context.currentTime;
+  const notes = [
+    { time: 0, frequency: 659.25, duration: 0.12, gain: 0.028 },
+    { time: 0.09, frequency: 830.61, duration: 0.16, gain: 0.022 },
+    { time: 0.2, frequency: 987.77, duration: 0.28, gain: 0.018 },
+  ];
+
+  notes.forEach((note) => {
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(note.frequency, now + note.time);
+    gainNode.gain.setValueAtTime(0.0001, now + note.time);
+    gainNode.gain.exponentialRampToValueAtTime(note.gain, now + note.time + 0.02);
+    gainNode.gain.exponentialRampToValueAtTime(
+      0.0001,
+      now + note.time + note.duration,
+    );
+
+    oscillator.connect(gainNode);
+    gainNode.connect(context.destination);
+    oscillator.start(now + note.time);
+    oscillator.stop(now + note.time + note.duration);
+  });
+}
+
+function sendNotification(nextPhase) {
+  if (!state.notificationsEnabled || getNotificationPermission() !== "granted") {
+    return;
+  }
+
+  const body =
+    nextPhase === "work"
+      ? "休憩が終わりました。次の作業セッションを始めましょう。"
+      : "作業セッションが終わりました。少し休憩しましょう。";
+
+  const notification = new Notification("Pomodoro Flow", {
+    body,
+    tag: "pomodoro-flow-phase-change",
+    renotify: true,
+  });
+
+  window.setTimeout(() => notification.close(), 5000);
+}
+
+async function enableNotifications() {
+  await ensureAudioReady();
+
+  if (!("Notification" in window)) {
+    updateNotificationUI();
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+  state.notificationsEnabled = permission === "granted";
+  updateNotificationUI();
+
+  if (permission === "granted") {
+    elements.statusText.textContent =
+      "通知を有効化しました。フェーズ切替時にOS通知と通知音を送ります。";
+  }
+}
 
 function syncInputWithPreset(phase) {
   const preset = phase === "work" ? elements.workPreset : elements.breakPreset;
@@ -70,6 +203,8 @@ function render() {
     elements.statusText.textContent =
       "開始すると、終了するまで作業と休憩を交互に続けます。";
   }
+
+  updateNotificationUI();
 }
 
 function resetPhase(phase) {
@@ -105,6 +240,8 @@ function advancePhase() {
     nextPhase === "work"
       ? "休憩が終わりました。作業時間を再開します。"
       : "作業が終わりました。休憩に切り替わります。";
+  playNotificationSound();
+  sendNotification(nextPhase);
   render();
 }
 
@@ -118,10 +255,12 @@ function tick() {
   advancePhase();
 }
 
-function startTimer() {
+async function startTimer() {
   if (timerId !== null) {
     return;
   }
+
+  await ensureAudioReady();
 
   if (state.status === "idle") {
     applySettings();
@@ -158,6 +297,7 @@ elements.workMinutes.addEventListener("change", applySettings);
 elements.breakMinutes.addEventListener("change", applySettings);
 elements.startButton.addEventListener("click", startTimer);
 elements.pauseButton.addEventListener("click", pauseTimer);
+elements.notificationButton.addEventListener("click", enableNotifications);
 elements.stopButton.addEventListener("click", () => {
   stopTimer();
   elements.statusText.textContent =
