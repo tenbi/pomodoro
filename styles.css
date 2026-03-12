@@ -1,0 +1,221 @@
+:root {
+  --bg-top: #f8f1e7;
+  --bg-bottom: #d7e7f1;
+  --panel: rgba(255, 252, 247, 0.78);
+  --panel-border: rgba(76, 54, 36, 0.12);
+  --text-main: #2b211a;
+  --text-soft: #6a5a4d;
+  --accent-work: #c96c4a;
+  --accent-break: #4d8c7b;
+  --button: #2e2621;
+  --button-text: #fff9f2;
+  --shadow: 0 24px 80px rgba(72, 52, 34, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family:
+    "Hiragino Sans",
+    "Avenir Next",
+    "Yu Gothic",
+    sans-serif;
+  color: var(--text-main);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), transparent 36%),
+    linear-gradient(135deg, var(--bg-top), var(--bg-bottom));
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+}
+
+.timer-card {
+  width: min(100%, 760px);
+  padding: 32px;
+  border: 1px solid var(--panel-border);
+  border-radius: 28px;
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+}
+
+.eyebrow,
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+.eyebrow {
+  font-family: "Avenir Next Condensed", "Hiragino Kaku Gothic Std", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}
+
+h1 {
+  margin-top: 8px;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 0.95;
+  font-family: "Avenir Next Condensed", "Hiragino Kaku Gothic Std", sans-serif;
+}
+
+.lead,
+.section-heading p,
+#phaseHint,
+.status-text {
+  color: var(--text-soft);
+}
+
+.lead {
+  margin: 12px 0 24px;
+}
+
+.phase-panel {
+  padding: 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(76, 54, 36, 0.08);
+}
+
+.phase-panel[data-phase="work"] {
+  --phase-accent: var(--accent-work);
+}
+
+.phase-panel[data-phase="break"] {
+  --phase-accent: var(--accent-break);
+}
+
+.phase-label {
+  margin: 0 0 6px;
+  color: var(--phase-accent);
+  font-weight: 700;
+}
+
+#phaseName {
+  font-size: 1.8rem;
+}
+
+#phaseHint {
+  margin: 8px 0 0;
+}
+
+.time-display {
+  margin: 28px 0 18px;
+  text-align: center;
+  font-family: "Avenir Next Condensed", "SF Mono", monospace;
+  font-size: clamp(4rem, 13vw, 7rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.progress-track {
+  width: 100%;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(46, 38, 33, 0.08);
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-work), #f3b783);
+  transition: width 0.5s ease;
+}
+
+.phase-panel[data-phase="break"] ~ .progress-track .progress-bar {
+  background: linear-gradient(90deg, var(--accent-break), #8ad0be);
+}
+
+.settings-panel {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(76, 54, 36, 0.1);
+}
+
+.section-heading p {
+  margin: 8px 0 0;
+}
+
+.setting-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.setting-block {
+  display: grid;
+  gap: 8px;
+}
+
+.setting-block span {
+  font-weight: 700;
+}
+
+.setting-block input,
+.setting-block select,
+.controls button {
+  border: 1px solid rgba(76, 54, 36, 0.12);
+  border-radius: 16px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-main);
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.controls button {
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.controls button:hover {
+  transform: translateY(-1px);
+}
+
+.controls .primary {
+  border-color: transparent;
+  background: var(--button);
+  color: var(--button-text);
+}
+
+.status-text {
+  margin: 18px 0 0;
+  min-height: 1.5em;
+}
+
+@media (max-width: 640px) {
+  .timer-card {
+    padding: 24px 18px;
+  }
+
+  .setting-grid,
+  .controls {
+    grid-template-columns: 1fr;
+  }
+}

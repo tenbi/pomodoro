@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pomodoro Flow</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="timer-card">
+        <p class="eyebrow">Pomodoro Timer</p>
+        <h1>Pomodoro Flow</h1>
+        <p class="lead">
+          作業と休憩を、止めるまで静かに繰り返すタイマーです。
+        </p>
+
+        <div class="phase-panel" data-phase="work">
+          <p class="phase-label">現在のフェーズ</p>
+          <h2 id="phaseName">作業時間</h2>
+          <p id="phaseHint">次は休憩に切り替わります</p>
+        </div>
+
+        <div class="time-display" id="timeDisplay" aria-live="polite">25:00</div>
+
+        <div class="progress-track" aria-hidden="true">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <section class="settings-panel" aria-labelledby="settingsTitle">
+          <div class="section-heading">
+            <h3 id="settingsTitle">時間設定</h3>
+            <p>プリセットを選ぶか、分単位で自由に入力できます。</p>
+          </div>
+
+          <div class="setting-grid">
+            <label class="setting-block">
+              <span>作業プリセット</span>
+              <select id="workPreset">
+                <option value="25" selected>25分</option>
+                <option value="15">15分</option>
+                <option value="30">30分</option>
+                <option value="45">45分</option>
+                <option value="60">60分</option>
+              </select>
+            </label>
+
+            <label class="setting-block">
+              <span>作業時間（分）</span>
+              <input id="workMinutes" type="number" min="1" max="180" value="25" />
+            </label>
+
+            <label class="setting-block">
+              <span>休憩プリセット</span>
+              <select id="breakPreset">
+                <option value="5" selected>5分</option>
+                <option value="10">10分</option>
+                <option value="15">15分</option>
+                <option value="20">20分</option>
+                <option value="30">30分</option>
+              </select>
+            </label>
+
+            <label class="setting-block">
+              <span>休憩時間（分）</span>
+              <input id="breakMinutes" type="number" min="1" max="180" value="5" />
+            </label>
+          </div>
+        </section>
+
+        <div class="controls">
+          <button id="startButton" class="primary">スタート</button>
+          <button id="pauseButton">一時停止</button>
+          <button id="stopButton">終了</button>
+        </div>
+
+        <p class="status-text" id="statusText">
+          開始すると、終了するまで作業と休憩を交互に続けます。
+        </p>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
